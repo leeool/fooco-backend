@@ -1,25 +1,12 @@
 import { Router } from "express"
+import postController from "./controllers/postController"
 
 const router = Router()
 
-router.get("/", (req, res) => {
-  res.send("Hello World!")
-})
-router.get("/posts", (req, res) => {
-  res.json({
-    posts: [
-      {
-        id: 1,
-        title: "Post 1",
-        content: "Post 1 content"
-      },
-      {
-        id: 2,
-        title: "Post 2",
-        content: "Post 2 content"
-      }
-    ]
-  })
-})
+router.get("/posts", postController.index)
+router.get("/posts/:id", postController.show)
+router.post("/posts", postController.store)
+router.delete("/posts/:id", postController.delete)
+router.put("/posts/:id", postController.update)
 
 export default router

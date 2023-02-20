@@ -3,3 +3,4 @@ pnpm-lock.yaml
 .vscode
 dist
 dist/*
+.vercel

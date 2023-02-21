@@ -4,6 +4,8 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "lib": ["ESNext"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -11,8 +13,12 @@
     "sourceMap": true,
     "removeComments": true,
     "outDir": "./dist",
-    "rootDir": "api"
+    "rootDir": "src",
+    "strictPropertyInitialization": false
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["api"]
+  "include": ["src/**/*"],
+  "ts-node": {
+    "files": true
+  }
 }

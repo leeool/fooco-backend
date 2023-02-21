@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm"
@@ -22,6 +23,17 @@ class User {
   password: string
 
   @OneToMany(() => Post, (post) => post.user)
+  @JoinTable({
+    name: "post_user",
+    joinColumn: {
+      name: "user_id",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "post_id",
+      referencedColumnName: "id"
+    }
+  })
   posts: Post[]
 
   @CreateDateColumn()

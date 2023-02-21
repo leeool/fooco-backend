@@ -1,15 +1,24 @@
 import Express from "express"
 import postRepository from "../repositories/postRepository"
+import userRepository from "../repositories/userRepository"
 
 class postController {
-  index(req: Express.Request, res: Express.Response) {
-    const posts = postRepository.findAll()
+  async index(req: Express.Request, res: Express.Response) {
+    const posts = await postRepository.find({
+      relations: {
+        user: true
+      }
+    })
 
-    res.json(posts)
+    res.status(200).json(posts)
   }
-  show(req: Express.Request, res: Express.Response) {
+
+  async show(req: Express.Request, res: Express.Response) {
     const { id } = req.params
-    const post = postRepository.findById(id)
+    const post = await postRepository.findOne({
+      relations: { user: true },
+      where: { id: id }
+    })
 
     if (!post) {
       return res.status(400).json({ error: "Post not found" })
@@ -17,47 +26,90 @@ class postController {
 
     res.json(post)
   }
-  store(req: Express.Request, res: Express.Response) {
-    const { title, content } = req.body
+
+  async store(req: Express.Request, res: Express.Response) {
+    const { title, content, user_id } = req.body
 
     if (!title || !content) {
       return res.status(400).json({ error: "Post not valid" })
     }
 
-    const post = postRepository.create({ title, content })
+    const userExists = await userRepository.findOneBy({ id: user_id })
 
-    res.json(post)
+    if (!userExists) {
+      return res.status(400).json({ error: "User not found" })
+    }
+
+    const post = postRepository.create({ title, content, user: userExists })
+    await postRepository.save(post)
+
+    console.log(post)
+
+    res.status(201).json(post)
   }
-  update(req: Express.Request, res: Express.Response) {
-    const { title, content } = req.body
+
+  async update(req: Express.Request, res: Express.Response) {
+    const { title, content, user_id } = req.body
     const { id } = req.params
 
-    const postById = postRepository.findById(id)
+    const postById = await postRepository.findOne({
+      relations: { user: true },
+      where: { id: id }
+    })
+
+    const userById = await userRepository.findOne({
+      where: { id: user_id },
+      relations: { posts: true }
+    })
+
+    const userOwnerPost = await postRepository.find({
+      where: { user: { id: user_id }, id: id },
+      relations: { user: true }
+    })
 
     if (!postById) {
-      return res.status(400).json({ error: "Post not found" })
+      return res.status(404).json({ error: "Post not found" })
+    }
+
+    if (!userById) {
+      return res.status(404).json({ error: "User not found" })
     }
 
     if (!title || !content) {
       return res.status(400).json({ error: "Post not valid" })
     }
 
-    const updatedPost = postRepository.update(id, { title, content })
+    if (!userOwnerPost.length) {
+      return res.status(403).json({ error: "This user not own this post" })
+    }
+
+    const updatedPost = postRepository.create({ ...postById, title, content })
+    await postRepository.update(id, updatedPost)
 
     res.json(updatedPost)
   }
-  delete(req: Express.Request, res: Express.Response) {
+
+  async delete(req: Express.Request, res: Express.Response) {
     const { id } = req.params
+    const { user_id } = req.body
 
-    const postById = postRepository.findById(id)
+    const postById = postRepository.findBy({ id: id })
 
-    if (!postById) {
-      return res.status(400).json({ error: "Post not found" })
+    const userOwnerPost = await postRepository.find({
+      where: { user: { id: user_id }, id: id },
+      relations: { user: true }
+    })
+
+    if (!userOwnerPost.length) {
+      return res.status(403).json({ error: "This user not own this post" })
     }
 
-    const deletedPost = postRepository.delete(id)
+    if (!postById) {
+      return res.status(404).json({ error: "Post not found" })
+    }
 
-    res.json(deletedPost)
+    res.status(204).json(postById)
+    await postRepository.delete(id)
   }
 }
 

@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -9,8 +10,8 @@ import User from "./User"
 
 @Entity("posts")
 class Post {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn("uuid")
+  id: string
 
   @Column({ type: "varchar", length: 100 })
   title: string
@@ -21,8 +22,8 @@ class Post {
   @Column({ type: "int", default: 0 })
   points: number
 
-  @Column({ type: "date" })
-  createdDate: Date
+  @CreateDateColumn()
+  created_at: Date
 
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })

@@ -1,10 +1,16 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from "typeorm"
 import Post from "./Post"
 
 @Entity("users")
 class User {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryGeneratedColumn("uuid")
+  id: string
 
   @Column({ type: "varchar", length: 100, unique: true })
   username: string
@@ -18,7 +24,7 @@ class User {
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[]
 
-  @Column({ type: "date", update: false })
+  @CreateDateColumn()
   created_at: Date
 }
 

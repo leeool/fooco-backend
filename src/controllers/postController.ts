@@ -63,8 +63,7 @@ class postController {
     })
 
     const userOwnerPost = await postRepository.find({
-      where: { user: { id: user_id }, id: id },
-      relations: { user: true }
+      where: { user: { id: user_id }, id: id }
     })
 
     if (!postById) {

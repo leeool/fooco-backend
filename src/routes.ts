@@ -15,5 +15,7 @@ router.put("/post/:id", postController.update)
 router.post("/user", userController.store)
 router.get("/user", userController.index)
 router.get("/user/:id", userController.show)
+router.put("/user/:id", userController.update)
+router.delete("/user/:id", userController.delete)
 
 export default router

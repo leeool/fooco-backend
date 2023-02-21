@@ -5,13 +5,15 @@ import userController from "./controllers/userController"
 const router = Router()
 
 // POSTS
-router.get("/posts", postController.index)
-router.get("/posts/:id", postController.show)
-router.post("/posts", postController.store)
-router.delete("/posts/:id", postController.delete)
-router.put("/posts/:id", postController.update)
+router.get("/post", postController.index)
+router.get("/post/:id", postController.show)
+router.post("/post", postController.store)
+router.delete("/post/:id", postController.delete)
+router.put("/post/:id", postController.update)
 
 // USERS
-router.post("/user", userController.create)
+router.post("/user", userController.store)
+router.get("/user", userController.index)
+router.get("/user/:id", userController.show)
 
 export default router

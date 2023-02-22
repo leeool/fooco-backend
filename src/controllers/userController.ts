@@ -34,6 +34,22 @@ class UserController {
         .json({ error: "Por favor, preencha todos os campos." })
     }
 
+    const userExists = await userRepository.findOneBy({ email: email })
+
+    if (userExists) {
+      return res
+        .status(400)
+        .json({ error: "Usuário com este email já cadastrado." })
+    }
+
+    const usernameExists = await userRepository.findOneBy({ username })
+
+    if (usernameExists) {
+      return res
+        .status(400)
+        .json({ error: "Usuário com este username já cadastrado." })
+    }
+
     const newUser = userRepository.create({
       username,
       email,
@@ -53,6 +69,22 @@ class UserController {
 
     if (!user) {
       return res.status(400).json({ error: "User not found" })
+    }
+
+    const userExists = await userRepository.findOneBy({ email: email })
+
+    if (userExists) {
+      return res
+        .status(400)
+        .json({ error: "Já existe um usuário com este email" })
+    }
+
+    const usernameExists = await userRepository.findOneBy({ username })
+
+    if (usernameExists) {
+      return res
+        .status(400)
+        .json({ error: "Já existe um usuário com este username" })
     }
 
     const updatedUser = userRepository.create({
@@ -88,6 +120,10 @@ class UserController {
     await userRepository.delete(id)
 
     res.status(200).json(userExists)
+  }
+
+  async login(req: Request, res: Response) {
+    const { email, password } = req.body
   }
 }
 

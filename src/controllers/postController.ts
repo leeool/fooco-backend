@@ -7,6 +7,17 @@ class postController {
     const posts = await postRepository.find({
       relations: {
         user: true
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        points: true,
+        created_at: true,
+        user: {
+          id: true,
+          username: true
+        }
       }
     })
 
@@ -14,10 +25,11 @@ class postController {
   }
 
   async show(req: Express.Request, res: Express.Response) {
-    const { id } = req.params
+    const { postId } = req.params
     const post = await postRepository.findOne({
       relations: { user: true },
-      where: { id: id }
+      where: { id: postId },
+      select: { user: { id: true, username: true, posts: true } }
     })
 
     if (!post) {
@@ -40,21 +52,21 @@ class postController {
       return res.status(400).json({ error: "User not found" })
     }
 
-    const post = postRepository.create({ title, content, user: userExists })
-    await postRepository.save(post)
+    const { password, ...user } = userExists
 
-    console.log(post)
+    const post = postRepository.create({ title, content, user })
+    await postRepository.save(post)
 
     res.status(201).json(post)
   }
 
   async update(req: Express.Request, res: Express.Response) {
     const { title, content, user_id } = req.body
-    const { id } = req.params
+    const { postId } = req.params
 
     const postById = await postRepository.findOne({
       relations: { user: true },
-      where: { id: id }
+      where: { id: postId }
     })
 
     const userById = await userRepository.findOne({
@@ -63,7 +75,7 @@ class postController {
     })
 
     const userOwnerPost = await postRepository.find({
-      where: { user: { id: user_id }, id: id }
+      where: { user: { id: user_id }, id: postId }
     })
 
     if (!postById) {
@@ -83,19 +95,19 @@ class postController {
     }
 
     const updatedPost = postRepository.create({ ...postById, title, content })
-    await postRepository.update(id, updatedPost)
+    await postRepository.update(postId, updatedPost)
 
     res.json(updatedPost)
   }
 
   async delete(req: Express.Request, res: Express.Response) {
-    const { id } = req.params
+    const { postId } = req.params
     const { user_id } = req.body
 
-    const postById = postRepository.findBy({ id: id })
+    const postById = postRepository.findBy({ id: postId })
 
     const userOwnerPost = await postRepository.find({
-      where: { user: { id: user_id }, id: id },
+      where: { user: { id: user_id }, id: postId },
       relations: { user: true }
     })
 
@@ -108,7 +120,7 @@ class postController {
     }
 
     res.status(204).json(postById)
-    await postRepository.delete(id)
+    await postRepository.delete(postId)
   }
 }
 

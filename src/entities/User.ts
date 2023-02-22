@@ -19,10 +19,10 @@ class User {
   @Column({ type: "varchar", length: 100, unique: true })
   email: string
 
-  @Column({ type: "varchar", length: 100 })
+  @Column({ type: "text" })
   password: string
 
-  @OneToMany(() => Post, (post) => post.user)
+  @OneToMany(() => Post, (post) => post.user, { eager: true })
   @JoinTable({
     name: "post_user",
     joinColumn: {

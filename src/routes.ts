@@ -2,6 +2,7 @@ import { Router } from "express"
 import postController from "./controllers/postController"
 import userController from "./controllers/userController"
 import { auth } from "./middlewares/auth"
+import "express-async-errors"
 
 const router = Router()
 

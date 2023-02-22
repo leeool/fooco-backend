@@ -149,8 +149,7 @@ class UserController {
     }
 
     const user = await userRepository.findOne({
-      where: [{ email: email }, { username: email }],
-      select: ["id", "username", "email"]
+      where: [{ email: email }, { username: email }]
     })
 
     if (!user) {

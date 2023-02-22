@@ -1,4 +1,9 @@
 import Express from "express"
+import ApiError, {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError
+} from "../helpers/apiErrors"
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 
@@ -7,17 +12,6 @@ class postController {
     const posts = await postRepository.find({
       relations: {
         user: true
-      },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        points: true,
-        created_at: true,
-        user: {
-          id: true,
-          username: true
-        }
       }
     })
 
@@ -26,14 +20,14 @@ class postController {
 
   async show(req: Express.Request, res: Express.Response) {
     const { postId } = req.params
+
     const post = await postRepository.findOne({
       relations: { user: true },
-      where: { id: postId },
-      select: { user: { id: true, username: true, posts: true } }
+      where: { id: postId }
     })
 
     if (!post) {
-      return res.status(400).json({ error: "Post not found" })
+      throw new NotFoundError("Post nao encontrado.")
     }
 
     res.json(post)
@@ -43,13 +37,13 @@ class postController {
     const { title, content, user_id } = req.body
 
     if (!title || !content) {
-      return res.status(400).json({ error: "Post not valid" })
+      throw new BadRequestError("Titulo e conteúdo não foram informados.")
     }
 
     const userExists = await userRepository.findOneBy({ id: user_id })
 
     if (!userExists) {
-      return res.status(400).json({ error: "User not found" })
+      throw new NotFoundError("Usuário não encontrado.")
     }
 
     const { password, ...user } = userExists
@@ -79,19 +73,19 @@ class postController {
     })
 
     if (!postById) {
-      return res.status(404).json({ error: "Post not found" })
+      throw new NotFoundError("Post não encontrado.")
     }
 
     if (!userById) {
-      return res.status(404).json({ error: "User not found" })
+      throw new NotFoundError("Usuário não encontrado.")
     }
 
     if (!title || !content) {
-      return res.status(400).json({ error: "Post not valid" })
+      throw new BadRequestError("Titulo e conteúdo não foram informados.")
     }
 
     if (!userOwnerPost.length) {
-      return res.status(403).json({ error: "This user not own this post" })
+      throw new ForbiddenError("Este post não pertence ao usuário.")
     }
 
     const updatedPost = postRepository.create({ ...postById, title, content })
@@ -112,11 +106,11 @@ class postController {
     })
 
     if (!userOwnerPost.length) {
-      return res.status(403).json({ error: "This user not own this post" })
+      throw new ForbiddenError("Este post não pertence ao usuário.")
     }
 
     if (!postById) {
-      return res.status(404).json({ error: "Post not found" })
+      throw new NotFoundError("Post não encontrado.")
     }
 
     res.status(204).json(postById)

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import jwt from "jsonwebtoken"
 import { And, Equal } from "typeorm"
+import { UnauthorizedError } from "../helpers/apiErrors"
 import userRepository from "../repositories/userRepository"
 
 interface JWTPayload {
@@ -13,7 +14,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.body
 
   if (!authorization) {
-    return res.status(401).json({ error: "Token not provided" })
+    throw new UnauthorizedError("Token não encontrado.")
   }
 
   const token = authorization.split(" ")[1]
@@ -25,7 +26,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   })
 
   if (!user) {
-    return res.status(401).json({ error: "Não autorizado" })
+    throw new UnauthorizedError("Usuário não autorizado.")
   }
 
   next()

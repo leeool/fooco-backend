@@ -4,12 +4,12 @@ import userRepository from "../repositories/userRepository"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { Equal, Not } from "typeorm"
+import { BadRequestError, NotFoundError } from "../helpers/apiErrors"
 
 class UserController {
   async index(req: Request, res: Response) {
     const users = await userRepository.find({
-      relations: { posts: true },
-      select: ["id", "username", "email", "created_at"]
+      relations: { posts: true }
     })
 
     res.status(200).json(users)
@@ -20,11 +20,11 @@ class UserController {
 
     const user = await userRepository.findOne({
       relations: { posts: { user: false } },
-      where: { id: userId },
-      select: ["id", "username", "email", "created_at"]
+      where: { id: userId }
     })
 
     if (!user) {
+      throw new NotFoundError("Usuário não encontrado.")
       return res.status(400).json({ error: "User not found" })
     }
 
@@ -36,25 +36,15 @@ class UserController {
     const { username, email, password } = req.body
 
     if (!username || !email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Por favor, preencha todos os campos." })
+      throw new BadRequestError("Todos os campos são obrigatórios.")
     }
 
-    const userExists = await userRepository.findOneBy({ email: email })
+    const userExists = await userRepository.findOne({
+      where: [{ username }, { email }]
+    })
 
     if (userExists) {
-      return res
-        .status(400)
-        .json({ error: "Usuário com este email já cadastrado." })
-    }
-
-    const usernameExists = await userRepository.findOneBy({ username })
-
-    if (usernameExists) {
-      return res
-        .status(400)
-        .json({ error: "Usuário com este username já cadastrado." })
+      throw new BadRequestError("Email ou Username já cadastrado.")
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -80,28 +70,20 @@ class UserController {
     })
 
     if (!user) {
-      return res.status(400).json({ error: "User not found" })
+      throw new NotFoundError("Usuário não encontrado.")
     }
 
     const userExists = await userRepository.findOne({
-      where: { email: Equal(email), id: Not(userId) }
+      where: [
+        { email: Equal(email), id: Not(userId) },
+        { username: Equal(username), id: Not(userId) }
+      ]
     })
 
     if (userExists) {
       return res
         .status(400)
-        .json({ error: "Já existe um usuário com este email" })
-    }
-
-    const usernameExists = await userRepository.findOneBy({
-      username: Equal(username),
-      id: Not(userId)
-    })
-
-    if (usernameExists) {
-      return res
-        .status(400)
-        .json({ error: "Já existe um usuário com este username" })
+        .json({ error: "Já existe um usuário com este email ou username" })
     }
 
     const updatedUser = userRepository.create({
@@ -130,7 +112,7 @@ class UserController {
     })
 
     if (!userExists) {
-      return res.status(400).json({ error: "User not found" })
+      throw new NotFoundError("Usuário não encontrado.")
     }
 
     await postRepository.delete({ user: { id: userId } })
@@ -143,30 +125,29 @@ class UserController {
     const { email, password } = req.body
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Por favor, preencha todos os campos." })
+      throw new BadRequestError("Todos os campos são obrigatórios.")
     }
 
     const user = await userRepository.findOne({
-      where: [{ email: email }, { username: email }]
+      where: [{ email: email }, { username: email }],
+      select: ["password", "id", "username"]
     })
 
     if (!user) {
-      return res.status(400).json({ error: "Email ou senha inválidos" })
+      throw new BadRequestError("Email ou senha inválidos.")
     }
 
     const verifiedPassword = await bcrypt.compare(password, user.password)
 
     if (!verifiedPassword) {
-      return res.status(400).json({ error: "Email ou senha inválidos" })
+      throw new BadRequestError("Email ou senha inválidos.")
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_PASS!, {
       expiresIn: "1d"
     })
 
-    const { password: _, ...userLogin } = user
+    const { password: _, posts, ...userLogin } = user
 
     res.status(200).json({ token, user: userLogin })
   }

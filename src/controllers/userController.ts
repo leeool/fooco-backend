@@ -25,14 +25,12 @@ class UserController {
 
     if (!user) {
       throw new NotFoundError("Usuário não encontrado.")
-      return res.status(400).json({ error: "User not found" })
     }
 
     res.json(user)
   }
 
   async store(req: Request, res: Response) {
-    // criar usuário
     const { username, email, password } = req.body
 
     if (!username || !email || !password) {
@@ -66,7 +64,8 @@ class UserController {
     const { username, email, password } = req.body
 
     let user = await userRepository.findOne({
-      where: { id: userId }
+      where: { id: userId },
+      select: { id: true, username: true, email: true, password: true }
     })
 
     if (!user) {
@@ -81,18 +80,18 @@ class UserController {
     })
 
     if (userExists) {
-      return res
-        .status(400)
-        .json({ error: "Já existe um usuário com este email ou username" })
+      throw new BadRequestError("Email ou Username já cadastrado.")
     }
 
+    const updatedPassword = password
+      ? await bcrypt.hash(password, 10)
+      : user.password
+
     const updatedUser = userRepository.create({
-      ...user,
       username,
       email,
-      password
+      password: updatedPassword
     })
-
     await userRepository.update(userId, updatedUser)
 
     user = await userRepository.findOne({
@@ -130,7 +129,7 @@ class UserController {
 
     const user = await userRepository.findOne({
       where: [{ email: email }, { username: email }],
-      select: ["password", "id", "username"]
+      select: ["password", "id", "username", "email"]
     })
 
     if (!user) {

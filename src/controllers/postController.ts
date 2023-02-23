@@ -58,7 +58,7 @@ class postController {
     const { title, content, user_id } = req.body
     const { postId } = req.params
 
-    const postById = await postRepository.findOne({
+    let postById = await postRepository.findOne({
       relations: { user: true },
       where: { id: postId }
     })
@@ -80,18 +80,19 @@ class postController {
       throw new NotFoundError("Usuário não encontrado.")
     }
 
-    if (!title || !content) {
-      throw new BadRequestError("Titulo e conteúdo não foram informados.")
-    }
-
     if (!userOwnerPost.length) {
       throw new ForbiddenError("Este post não pertence ao usuário.")
     }
 
-    const updatedPost = postRepository.create({ ...postById, title, content })
+    const updatedPost = postRepository.create({ title, content })
     await postRepository.update(postId, updatedPost)
 
-    res.json(updatedPost)
+    postById = await postRepository.findOne({
+      relations: { user: true },
+      where: { id: postId }
+    })
+
+    res.json(postById)
   }
 
   async delete(req: Express.Request, res: Express.Response) {

@@ -8,11 +8,9 @@ AppDataSource.initialize().then(() => {
   const app = Express()
 
   app.use(Express.json())
-  app.use(cors({ credentials: true, origin: true }))
+  app.use(cors({ credentials: true, origin: "https://fooco.netlify.app" }))
   app.use(router)
-
   app.use(errorMiddleware)
-
   app.listen(process.env.PORT, () => {
     console.log("🔥 Server is running at http://localhost:" + process.env.PORT)
   })

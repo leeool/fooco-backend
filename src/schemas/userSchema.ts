@@ -21,7 +21,7 @@ const userSchema = z.object({
       .string()
       .trim()
       .min(8, "A Senha deve ter no mínimo 8 caracteres")
-      .regex(regexAtLeastOneNumber, "A senha deve conter ao menos um número")
+      .regex(regexAtLeastOneNumber, "A senha deve conter números e letras")
       .optional()
   })
 })

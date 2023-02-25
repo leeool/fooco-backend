@@ -8,7 +8,7 @@ AppDataSource.initialize().then(() => {
   const app = Express()
 
   app.use(Express.json())
-  app.use(cors())
+  app.use(cors({ credentials: true, origin: true }))
   app.use(router)
 
   app.use(errorMiddleware)

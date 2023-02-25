@@ -5,6 +5,7 @@ import { auth } from "./middlewares/auth"
 import "express-async-errors"
 import schemaParse from "./middlewares/schemaParse"
 import { validUUID, userSchema, postSchema } from "./schemas/"
+import tokenController from "./controllers/tokenController"
 
 const router = Router()
 
@@ -50,5 +51,8 @@ router.delete(
   auth,
   userController.delete
 )
+
+// TOKEN
+router.post("/token", tokenController.validadeToken)
 
 export default router

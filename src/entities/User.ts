@@ -36,7 +36,18 @@ class User {
   })
   posts: Post[]
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    transformer: {
+      to: (date: Date) => {
+        return new Date()
+      },
+      from: (date: Date) => {
+        return date.toLocaleString("pt-BR", {
+          localeMatcher: "best fit"
+        })
+      }
+    }
+  })
   created_at: Date
 }
 

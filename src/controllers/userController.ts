@@ -4,7 +4,12 @@ import userRepository from "../repositories/userRepository"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { Equal, Not } from "typeorm"
-import { BadRequestError, TooManyRequests } from "../helpers/apiErrors"
+import {
+  BadRequestError,
+  NotFoundError,
+  TooManyRequests,
+  UnauthorizedError
+} from "../helpers/apiErrors"
 
 class UserController {
   async index(req: Request, res: Response) {
@@ -80,7 +85,7 @@ class UserController {
     })
 
     if (!user) {
-      throw new TooManyRequests("Usuário não encontrado.")
+      throw new NotFoundError("Usuário não encontrado.")
     }
 
     const token = authorization!.split(" ")[1]
@@ -90,7 +95,7 @@ class UserController {
     }
 
     if (user.id !== token_id) {
-      throw new BadRequestError("Usuário não autorizado.")
+      throw new UnauthorizedError("Usuário não autorizado.")
     }
 
     const usernameExists = await userRepository.findOne({
@@ -139,7 +144,7 @@ class UserController {
     })
 
     if (!userExists) {
-      throw new TooManyRequests("Usuário não encontrado.")
+      throw new NotFoundError("Usuário não encontrado.")
     }
 
     const token = authorization!.split(" ")[1]
@@ -149,7 +154,7 @@ class UserController {
     }
 
     if (userExists.id !== token_id) {
-      throw new BadRequestError("Usuário não autorizado.")
+      throw new UnauthorizedError("Usuário não autorizado.")
     }
 
     await postRepository.delete({ user: { id: user_id } })

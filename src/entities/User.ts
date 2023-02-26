@@ -13,10 +13,10 @@ class User {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @Column({ type: "varchar", length: 100, unique: true })
+  @Column({ type: "varchar", unique: true })
   username: string
 
-  @Column({ type: "varchar", length: 100, unique: true })
+  @Column({ type: "varchar", unique: true })
   email: string
 
   @Column({ type: "text", select: false })
@@ -38,13 +38,13 @@ class User {
 
   @CreateDateColumn({
     transformer: {
-      to: (date: Date) => {
-        return new Date()
-      },
       from: (date: Date) => {
         return date.toLocaleString("pt-BR", {
           localeMatcher: "best fit"
         })
+      },
+      to: (date: Date) => {
+        return new Date()
       }
     }
   })

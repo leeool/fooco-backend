@@ -13,7 +13,7 @@ class Post {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @Column({ type: "varchar", length: 100 })
+  @Column({ type: "varchar" })
   title: string
 
   @Column({ type: "text" })

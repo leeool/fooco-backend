@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { AnyZodObject, ZodError, ZodIssue } from "zod"
-import ApiError, { BadRequestError } from "../helpers/apiErrors"
+import { BadRequestError } from "../helpers/apiErrors"
 
 const schemaParse =
   (schema: AnyZodObject) =>
@@ -13,6 +13,7 @@ const schemaParse =
     } catch (err) {
       if (err instanceof ZodError<ZodIssue[]>) {
         const error = err.errors.map((e) => e.message)[0]
+        console.log(err.errors)
         throw new BadRequestError(error)
       }
     }

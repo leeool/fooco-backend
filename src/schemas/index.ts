@@ -1,5 +1,13 @@
 import postSchema from "./postSchema"
-import userSchema from "./userSchema"
-import { validUUID } from "./paramsSchema"
+import schemaCreateUser from "./userSchemas/schemaCreateUser"
+import schemaUpdateUser from "./userSchemas/schemaUpdateUser"
+import schemaGetUser from "./userSchemas/schemaGetUser"
+import schemaDeleteUser from "./userSchemas/schemaDeleteUser"
 
-export { postSchema, userSchema, validUUID }
+export {
+  postSchema,
+  schemaCreateUser,
+  schemaUpdateUser,
+  schemaGetUser,
+  schemaDeleteUser
+}

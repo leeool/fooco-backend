@@ -29,5 +29,10 @@ export class NotFoundError extends ApiError {
     super(message, 404)
   }
 }
+export class TooManyRequests extends ApiError {
+  constructor(message: string) {
+    super(message, 429)
+  }
+}
 
 export default ApiError

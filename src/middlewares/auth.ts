@@ -1,14 +1,14 @@
-import { NextFunction, Request, response, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import jwt from "jsonwebtoken"
-import { And, Equal } from "typeorm"
 import { UnauthorizedError } from "../helpers/apiErrors"
-import userRepository from "../repositories/userRepository"
 
-interface JWTPayload {
-  id: string
+declare global {
+  interface JWTPayload {
+    id: string
+  }
 }
 
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
+const auth = async (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers
 
   if (!authorization) {
@@ -25,3 +25,5 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     }
   })
 }
+
+export default auth

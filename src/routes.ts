@@ -3,7 +3,6 @@ import "express-async-errors"
 import postController from "./controllers/postController"
 import userController from "./controllers/userController"
 import tokenController from "./controllers/tokenController"
-import setLimiter from "./middlewares/rateLimiter"
 import auth from "./middlewares/auth"
 import schemaParse from "./middlewares/schemaParse"
 import {
@@ -13,12 +12,6 @@ import {
   schemaDeleteUser,
   schemaCreateUser
 } from "./schemas/"
-import {
-  deleteUserLimit,
-  loginUserLimit,
-  postUserLimit,
-  updateUserLimit
-} from "./helpers/limiters"
 
 const router = Router()
 
@@ -37,23 +30,16 @@ router.delete("/post/:postId", auth, postController.delete)
 // USERS
 router.get("/user", userController.index)
 router.get("/user/:user_id", schemaParse(schemaGetUser), userController.show)
-router.post(
-  "/user",
-  setLimiter(postUserLimit),
-  schemaParse(schemaCreateUser),
-  userController.store
-)
-router.post("/user/login", setLimiter(loginUserLimit), userController.login)
+router.post("/user", schemaParse(schemaCreateUser), userController.store)
+router.post("/user/login", userController.login)
 router.put(
   "/user/:user_id",
-  setLimiter(updateUserLimit),
   schemaParse(schemaUpdateUser),
   auth,
   userController.update
 )
 router.delete(
   "/user/:user_id",
-  setLimiter(deleteUserLimit),
   auth,
   schemaParse(schemaDeleteUser),
   userController.delete

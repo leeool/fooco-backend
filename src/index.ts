@@ -11,7 +11,7 @@ AppDataSource.initialize().then(() => {
 
   app.use(Express.json())
   app.use(cors({ origin: true, credentials: true }))
-  app.use(setLimiter(defaultLimiter))
+  // app.use(setLimiter(defaultLimiter))
   app.use(router)
   app.use(errorMiddleware)
   app.listen(process.env.PORT, () => {

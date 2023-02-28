@@ -1,6 +1,7 @@
 import { Request } from "express"
 import { rateLimit } from "express-rate-limit"
 import { TooManyRequests } from "../helpers/apiErrors"
+import { networkInterfaces } from "os"
 
 interface Props {
   timeInMinutes: number
@@ -12,11 +13,15 @@ const setLimiter = ({ timeInMinutes, maxRequests, message }: Props) => {
   const rateLimiter = rateLimit({
     windowMs: timeInMinutes * 60000,
     max: maxRequests,
-    keyGenerator: (req: Request) => {
-      return req.ip
+    keyGenerator: () => {
+      const ip = networkInterfaces().eno1?.[0].address
+
+      return ip || ""
     },
     handler: (req: Request, _) => {
-      throw new TooManyRequests(`${message} (${req.ip})`)
+      const ip = networkInterfaces().eno1?.[0].address
+
+      throw new TooManyRequests(`${message} (${ip})`)
     },
     legacyHeaders: true
   })

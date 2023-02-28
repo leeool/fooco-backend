@@ -7,7 +7,7 @@ const schemaCreateUser = z.object({
       .string()
       .trim()
       .email({
-        message: "Formtado de e-mail inválido"
+        message: "Formato de e-mail inválido"
       })
       .nullish(),
     username: z

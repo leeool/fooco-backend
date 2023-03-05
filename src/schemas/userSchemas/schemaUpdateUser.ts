@@ -1,6 +1,7 @@
 import { z } from "zod"
 
-const regexAtLeastOneNumber = /(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{1,})$/
+const passwordRegex =
+  /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$!%*?&]?)[A-Za-z\d@$#!%*?&]{8,}$/
 
 const schemaUpdateUser = z.object({
   body: z.object({

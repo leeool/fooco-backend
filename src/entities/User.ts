@@ -36,6 +36,24 @@ class User {
   })
   posts: Post[]
 
+  @Column({ default: [], array: true, type: "varchar" })
+  tags: string[]
+
+  @Column({ type: "varchar", default: "" })
+  educational_place: string
+
+  @Column({ type: "varchar", default: "" })
+  educational_place_url: string
+
+  @Column({ type: "varchar", length: 100, default: "" })
+  about: string
+
+  @Column({ type: "varchar", default: "" })
+  avatar_url: string
+
+  @Column({ type: "varchar", default: "" })
+  banner_url: string
+
   @CreateDateColumn({
     transformer: {
       from: (date: Date) => {

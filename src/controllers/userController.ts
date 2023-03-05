@@ -76,7 +76,17 @@ class UserController {
     res: Response
   ) {
     const { user_id } = req.params
-    const { username, email, password } = req.body
+    const {
+      username,
+      email,
+      password,
+      about,
+      avatar_url,
+      banner_url,
+      educational_place,
+      educational_place_url,
+      tags
+    } = req.body
     const { authorization } = req.headers
 
     let user = await userRepository.findOne({
@@ -121,7 +131,13 @@ class UserController {
     const updatedUser = userRepository.create({
       username: username || user.username,
       email: email || user.email,
-      password: updatedPassword
+      password: updatedPassword,
+      about,
+      avatar_url,
+      banner_url,
+      educational_place,
+      educational_place_url,
+      tags
     })
 
     await userRepository.update(user_id, updatedUser)
@@ -172,7 +188,20 @@ class UserController {
 
     const user = await userRepository.findOne({
       where: [{ email: email }, { username: email }],
-      select: ["password", "id", "username", "email"]
+      select: [
+        "password",
+        "id",
+        "username",
+        "email",
+        "about",
+        "avatar_url",
+        "banner_url",
+        "educational_place",
+        "educational_place_url",
+        "tags",
+        "posts",
+        "created_at"
+      ]
     })
 
     if (!user) {

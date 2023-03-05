@@ -8,7 +8,7 @@ const schemaUpdateUser = z.object({
       .string()
       .trim()
       .email({
-        message: "Formtado de e-mail inválido"
+        message: "Formatado de e-mail inválido"
       })
       .optional(),
     username: z

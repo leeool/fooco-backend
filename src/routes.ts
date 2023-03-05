@@ -26,6 +26,7 @@ router.put(
   postController.update
 )
 router.delete("/post/:postId", auth, postController.delete)
+router.post("/post/feedback/:post_id", auth, postController.feedback)
 
 // USERS
 router.get("/user", userController.index)

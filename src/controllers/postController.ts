@@ -46,7 +46,7 @@ class postController {
       throw new NotFoundError("Usuário não encontrado.")
     }
 
-    const { password, ...user } = userExists
+    const { password, posts, ...user } = userExists
 
     const post = postRepository.create({ title, content, user })
     await postRepository.save(post)
@@ -116,6 +116,111 @@ class postController {
 
     res.status(204).json(postById)
     await postRepository.delete(postId)
+  }
+
+  async feedback(
+    req: Express.Request<
+      { post_id: string },
+      {},
+      { option: "like" | "dislike"; user_id: string }
+    >,
+    res: Express.Response
+  ) {
+    const { post_id } = req.params
+    const { user_id, option } = req.body
+
+    const postById = await postRepository.findOneBy({ id: post_id })
+
+    if (!postById) {
+      throw new NotFoundError("Post não encontrado.")
+    }
+
+    const userExists = await userRepository.findOneBy({ id: user_id })
+
+    if (!userExists) {
+      throw new NotFoundError("Usuário não encontrado.")
+    }
+
+    if (!option || !["like", "dislike"].includes(option)) {
+      throw new BadRequestError("Opção inválida.")
+    }
+
+    if (option === "like") {
+      // usuário ja tem o post marcado com like
+      if (userExists.liked_posts.includes(post_id)) {
+        await postRepository.decrement({ id: post_id }, "points", 1)
+        await userRepository.update(userExists.id, {
+          liked_posts: userExists.liked_posts.filter(
+            (value) => value !== post_id
+          )
+        })
+        res.json(postById.points - 1)
+        return
+      }
+
+      // usuário tem o post marcado com dislike
+      else if (userExists.disliked_posts.includes(post_id)) {
+        await postRepository.increment({ id: post_id }, "points", 2)
+        await userRepository.update(userExists.id, {
+          liked_posts: [...userExists.liked_posts, post_id]
+        })
+        await userRepository.update(userExists.id, {
+          disliked_posts: userExists.disliked_posts.filter(
+            (value) => value !== post_id
+          )
+        })
+        res.json(postById.points + 2)
+        return
+      }
+
+      // usuário não tem o post marcado com dislike nem like
+      else {
+        await postRepository.increment({ id: post_id }, "points", 1)
+        await userRepository.update(userExists.id, {
+          liked_posts: [...userExists.liked_posts, post_id]
+        })
+        res.json(postById.points + 1)
+        return
+      }
+    } else if (option === "dislike") {
+      // usuário já tem o post marcado com dislike
+      if (userExists.disliked_posts.includes(post_id)) {
+        await postRepository.increment({ id: post_id }, "points", 1)
+        await userRepository.update(userExists.id, {
+          disliked_posts: userExists.disliked_posts.filter(
+            (value) => value !== post_id
+          )
+        })
+        res.json(postById.points + 1)
+        return
+      }
+
+      // usuário tem o post marcado com like
+      else if (userExists.liked_posts.includes(post_id)) {
+        await postRepository.decrement({ id: post_id }, "points", 2)
+        await userRepository.update(userExists.id, {
+          disliked_posts: [...userExists.disliked_posts, post_id]
+        })
+        await userRepository.update(userExists.id, {
+          liked_posts: userExists.liked_posts.filter(
+            (value) => value !== post_id
+          )
+        })
+        res.json(postById.points - 2)
+        return
+      }
+
+      // usuário nao deu like nem dislike
+      else {
+        await postRepository.decrement({ id: post_id }, "points", 1)
+
+        await userRepository.update(userExists.id, {
+          disliked_posts: [...userExists.disliked_posts, post_id]
+        })
+
+        res.json(postById.points - 1)
+      }
+    }
   }
 }
 

@@ -10,7 +10,8 @@ import {
   schemaUpdateUser,
   schemaGetUser,
   schemaDeleteUser,
-  schemaCreateUser
+  schemaCreateUser,
+  schemaCreatePost
 } from "./schemas/"
 
 const router = Router()
@@ -18,7 +19,7 @@ const router = Router()
 // POSTS
 router.get("/post", postController.index)
 router.get("/post/:postId", postController.show)
-router.post("/post", schemaParse(postSchema), auth, postController.store)
+router.post("/post", schemaParse(schemaCreatePost), auth, postController.store)
 router.put(
   "/post/:postId",
   schemaParse(postSchema),

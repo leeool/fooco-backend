@@ -22,7 +22,9 @@ class Post {
   @Column({ type: "int", default: 0 })
   points: number
 
-  @CreateDateColumn()
+  @Column({
+    default: () => "LOCALTIMESTAMP"
+  })
   created_at: Date
 
   @ManyToOne(() => User, (user) => user.posts)

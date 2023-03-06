@@ -2,10 +2,12 @@ import Express from "express"
 import ApiError, {
   BadRequestError,
   ForbiddenError,
-  NotFoundError
+  NotFoundError,
+  UnauthorizedError
 } from "../helpers/apiErrors"
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
+import jwt from "jsonwebtoken"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
@@ -35,15 +37,26 @@ class postController {
 
   async store(req: Express.Request, res: Express.Response) {
     const { title, content, user_id } = req.body
-
-    if (!title || !content) {
-      throw new BadRequestError("Titulo e conteúdo não foram informados.")
-    }
+    const { authorization } = req.headers
 
     const userExists = await userRepository.findOneBy({ id: user_id })
 
     if (!userExists) {
       throw new NotFoundError("Usuário não encontrado.")
+    }
+
+    const token = authorization!.split(" ")[1]
+
+    const { id: token_id } = jwt.verify(token, process.env.JWT_PASS!) as {
+      id: string
+    }
+
+    if (userExists.id !== token_id) {
+      throw new UnauthorizedError("Usuário não autorizado.")
+    }
+
+    if (!title || !content) {
+      throw new BadRequestError("Titulo e conteúdo não foram informados.")
     }
 
     const { password, posts, ...user } = userExists
@@ -57,6 +70,7 @@ class postController {
   async update(req: Express.Request, res: Express.Response) {
     const { title, content, user_id } = req.body
     const { postId } = req.params
+    const { authorization } = req.headers
 
     let postById = await postRepository.findOne({
       relations: { user: true },
@@ -80,6 +94,16 @@ class postController {
       throw new NotFoundError("Usuário não encontrado.")
     }
 
+    const token = authorization!.split(" ")[1]
+
+    const { id: token_id } = jwt.verify(token, process.env.JWT_PASS!) as {
+      id: string
+    }
+
+    if (userById.id !== token_id) {
+      throw new UnauthorizedError("Usuário não autorizado.")
+    }
+
     if (!userOwnerPost.length) {
       throw new ForbiddenError("Este post não pertence ao usuário.")
     }
@@ -98,8 +122,10 @@ class postController {
   async delete(req: Express.Request, res: Express.Response) {
     const { postId } = req.params
     const { user_id } = req.body
+    const { authorization } = req.headers
 
-    const postById = postRepository.findBy({ id: postId })
+    const postById = await postRepository.findBy({ id: postId })
+    const userById = await userRepository.findOneBy({ id: user_id })
 
     const userOwnerPost = await postRepository.find({
       where: { user: { id: user_id }, id: postId },
@@ -112,6 +138,20 @@ class postController {
 
     if (!postById) {
       throw new NotFoundError("Post não encontrado.")
+    }
+
+    if (!userById) {
+      throw new NotFoundError("Usuário não encontrado.")
+    }
+
+    const token = authorization!.split(" ")[1]
+
+    const { id: token_id } = jwt.verify(token, process.env.JWT_PASS!) as {
+      id: string
+    }
+
+    if (userById.id !== token_id) {
+      throw new UnauthorizedError("Usuário não autorizado.")
     }
 
     res.status(204).json(postById)

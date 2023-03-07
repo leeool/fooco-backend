@@ -14,7 +14,6 @@ class tokenController {
 
     jwt.verify(token, process.env.JWT_PASS!, (err, decoded) => {
       if (err) throw new UnauthorizedError("Token inválido.")
-      console.log(decoded)
       return res.status(200).json(decoded)
     })
   }

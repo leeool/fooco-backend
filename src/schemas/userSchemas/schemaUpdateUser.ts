@@ -27,7 +27,7 @@ const schemaUpdateUser = z.object({
     tags: z.array(z.string()).optional(),
     educational_place: z.string().optional(),
     educational_place_url: z.string().url("Formato de URL inválida").optional(),
-    about: z.string().max(100).optional(),
+    about: z.string().max(300).optional(),
     avatar_url: z.string().url("Formato de URL Inválido").optional(),
     banner_url: z.string().url("Formato de URL inválido").optional()
   }),

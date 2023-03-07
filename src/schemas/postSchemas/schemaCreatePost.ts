@@ -5,12 +5,12 @@ const schemaCreatePost = z.object({
       .string()
       .trim()
       .min(4, "Seu título é muito curto!")
-      .max(30, "Seu título é muito longo!"),
+      .max(80, "Seu título é muito longo!"),
     content: z
       .string()
       .trim()
       .min(4, "O conteúdo do seu post é muito curto!")
-      .max(200, "O conteúdo do seu post é muito longo!"),
+      .max(500, "O conteúdo do seu post é muito longo!"),
     user_id: z.string().trim().uuid("Formato de ID inválido")
   })
 })

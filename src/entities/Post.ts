@@ -27,6 +27,15 @@ class Post {
   })
   created_at: Date
 
+  @Column({ default: [], array: true, type: "varchar" })
+  tags: string[]
+
+  @Column({ default: [], array: true, type: "varchar" })
+  users_liked: string[]
+
+  @Column({ default: [], array: true, type: "varchar" })
+  users_disliked: string[]
+
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })
   user: User

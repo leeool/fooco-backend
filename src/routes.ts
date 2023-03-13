@@ -18,15 +18,15 @@ const router = Router()
 
 // POSTS
 router.get("/post", postController.index)
-router.get("/post/:postId", postController.show)
+router.get("/post/:post_id", postController.show)
 router.post("/post", schemaParse(schemaCreatePost), auth, postController.store)
 router.put(
-  "/post/:postId",
+  "/post/:post_id",
   schemaParse(postSchema),
   auth,
   postController.update
 )
-router.delete("/post/:postId", auth, postController.delete)
+router.delete("/post/:post_id", auth, postController.delete)
 router.post("/post/feedback/:post_id", auth, postController.feedback)
 
 // USERS

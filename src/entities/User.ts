@@ -36,9 +36,6 @@ class User {
   })
   posts: Post[]
 
-  @Column({ default: [], array: true, type: "varchar" })
-  tags: string[]
-
   @Column({ type: "varchar", default: "" })
   educational_place: string
 
@@ -53,12 +50,6 @@ class User {
 
   @Column({ type: "varchar", default: "" })
   banner_url: string
-
-  @Column({ type: "varchar", default: [], array: true })
-  liked_posts: string[]
-
-  @Column({ type: "varchar", default: [], array: true })
-  disliked_posts: string[]
 
   @CreateDateColumn({
     transformer: {

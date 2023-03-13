@@ -1,4 +1,5 @@
 import { z } from "zod"
+
 const schemaCreatePost = z.object({
   body: z.object({
     title: z
@@ -9,9 +10,13 @@ const schemaCreatePost = z.object({
     content: z
       .string()
       .trim()
-      .min(4, "O conteúdo do seu post é muito curto!")
-      .max(500, "O conteúdo do seu post é muito longo!"),
-    user_id: z.string().trim().uuid("Formato de ID inválido")
+      .min(20, "O conteúdo do seu post é muito curto!")
+      .max(2000, "O conteúdo do seu post é muito longo!"),
+    user_id: z.string().trim().uuid("Formato de ID inválido"),
+    tags: z
+      .array(z.string().max(20, "Tag muito longa"))
+      .max(8, "Limite de tags atingido")
+      .optional()
   })
 })
 

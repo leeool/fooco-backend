@@ -52,7 +52,7 @@ class User {
   banner_url: string
 
   @Column({ type: "varchar", default: [], array: true })
-  savedPosts: string[]
+  saved_posts: string[]
 
   @CreateDateColumn({
     transformer: {

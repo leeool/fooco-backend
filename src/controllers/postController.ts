@@ -59,11 +59,11 @@ class postController {
     const { authorization } = req.headers
     const removeSpecialChars = /[^A-Za-z0-9\s-]/g
     const slugTitle = title
-      .split(" ")
-      .join("-")
       .normalize("NFD")
       .replaceAll(removeSpecialChars, "")
       .toLowerCase()
+      .split(" ")
+      .join("-")
 
     const token = authorization!.split(" ")[1]
 

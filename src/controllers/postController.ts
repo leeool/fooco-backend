@@ -21,18 +21,34 @@ class postController {
   }
 
   async show(req: Express.Request, res: Express.Response) {
-    const { post_id } = req.params
+    const { username, post_slug } = req.params
 
-    const post = await postRepository.findOne({
-      relations: { user: true },
-      where: { id: post_id }
+    const userExists = await userRepository.findOneBy({ username })
+
+    const postExists = await postRepository.findOneBy({
+      slug: post_slug,
+      user: { username }
     })
 
-    if (!post) {
-      throw new NotFoundError("Post nao encontrado.")
+    if (!userExists || !postExists) {
+      throw new NotFoundError("Página não encontrada.")
     }
 
-    res.json(post)
+    if (!post_slug) {
+      const userPosts = await postRepository.find({
+        relations: { user: true },
+        where: { user: { username: username } }
+      })
+
+      res.json(userPosts)
+    } else {
+      const post = await postRepository.findOne({
+        relations: { user: true },
+        where: { user: { username: username }, slug: post_slug }
+      })
+
+      res.json(post)
+    }
   }
 
   async store(
@@ -41,6 +57,13 @@ class postController {
   ) {
     const { title, content, user_id, tags } = req.body
     const { authorization } = req.headers
+    const removeSpecialChars = /[^A-Za-z0-9\s-]/g
+    const slugTitle = title
+      .split(" ")
+      .join("-")
+      .normalize("NFD")
+      .replaceAll(removeSpecialChars, "")
+      .toLowerCase()
 
     const token = authorization!.split(" ")[1]
 
@@ -68,7 +91,13 @@ class postController {
 
     const { password, posts, ...user } = userExists
 
-    const post = postRepository.create({ title, content, user, tags })
+    const post = postRepository.create({
+      title,
+      content,
+      user,
+      tags,
+      slug: slugTitle
+    })
     await postRepository.save(post)
 
     res.status(201).json(post)

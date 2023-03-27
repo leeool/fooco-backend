@@ -36,6 +36,9 @@ class Post {
   @Column({ default: [], array: true, type: "varchar" })
   users_disliked: string[]
 
+  @Column({ type: "varchar", default: "" })
+  slug: string
+
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })
   user: User

@@ -18,7 +18,8 @@ const router = Router()
 
 // POSTS
 router.get("/post", postController.index)
-router.get("/post/:post_id", postController.show)
+router.get("/post/:username/:post_slug", postController.show)
+router.get("/post/:username", postController.show)
 router.post("/post", schemaParse(schemaCreatePost), auth, postController.store)
 router.put(
   "/post/:post_id",

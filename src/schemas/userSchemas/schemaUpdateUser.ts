@@ -29,7 +29,7 @@ const schemaUpdateUser = z.object({
     about: z.string().max(300).optional(),
     avatar_url: z.string().url("Formato de URL Inválido").optional(),
     banner_url: z.string().url("Formato de URL inválido").optional(),
-    savedPosts: z.array(z.string())
+    saved_posts: z.array(z.string())
   }),
   params: z.object({
     user_id: z.string().uuid("ID de usuário inválido")

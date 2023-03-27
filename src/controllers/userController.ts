@@ -85,7 +85,7 @@ class UserController {
       banner_url,
       educational_place,
       educational_place_url,
-      savedPosts
+      saved_posts
     } = req.body
     const { authorization } = req.headers
 
@@ -137,7 +137,7 @@ class UserController {
       banner_url,
       educational_place,
       educational_place_url,
-      savedPosts: user.savedPosts.concat(savedPosts)
+      saved_posts: user.saved_posts.concat(saved_posts)
     })
 
     await userRepository.update(user_id, updatedUser)

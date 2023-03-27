@@ -51,6 +51,9 @@ class User {
   @Column({ type: "varchar", default: "" })
   banner_url: string
 
+  @Column({ type: "varchar", default: [], array: true })
+  savedPosts: string[]
+
   @CreateDateColumn({
     transformer: {
       from: (date: Date) => {

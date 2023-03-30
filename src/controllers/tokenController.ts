@@ -7,7 +7,7 @@ class tokenController {
     const { authorization } = req.headers
 
     if (!authorization) {
-      throw new UnauthorizedError("Token não encontrado.")
+      throw new UnauthorizedError("Token inválido.")
     }
 
     const token = authorization.split(" ")[1]

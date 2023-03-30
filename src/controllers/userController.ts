@@ -20,15 +20,15 @@ class UserController {
   }
 
   async show(req: Request, res: Response) {
-    const { username: userID } = req.params
+    const { username } = req.params
 
     const user = await userRepository.findOne({
       relations: { posts: { user: true } },
-      where: [{ username: userID }, { id: userID }]
+      where: { username: username }
     })
 
     if (!user) {
-      throw new TooManyRequests("Usuário não encontrado.")
+      throw new BadRequestError("Usuário não encontrado.")
     }
 
     res.json(user)
@@ -213,9 +213,13 @@ class UserController {
       throw new BadRequestError("E-mail ou senha inválidos.")
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_PASS!, {
-      expiresIn: "1d"
-    })
+    const token = jwt.sign(
+      { username: user.username, id: user.id },
+      process.env.JWT_PASS!,
+      {
+        expiresIn: "1d"
+      }
+    )
 
     const { password: _, ...userLogin } = user
 

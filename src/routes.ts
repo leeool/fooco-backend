@@ -32,7 +32,7 @@ router.post("/post/feedback/:post_id", auth, postController.feedback)
 
 // USERS
 router.get("/user", userController.index)
-router.get("/user/:user_id", schemaParse(schemaGetUser), userController.show)
+router.get("/user/:username", schemaParse(schemaGetUser), userController.show)
 router.post("/user", schemaParse(schemaCreateUser), userController.store)
 router.post("/user/login", userController.login)
 router.put(

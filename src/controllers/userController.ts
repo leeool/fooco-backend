@@ -20,11 +20,11 @@ class UserController {
   }
 
   async show(req: Request, res: Response) {
-    const { user_id } = req.params
+    const { username } = req.params
 
     const user = await userRepository.findOne({
       relations: { posts: { user: false } },
-      where: { id: user_id }
+      where: { username }
     })
 
     if (!user) {

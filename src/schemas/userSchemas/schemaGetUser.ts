@@ -2,7 +2,7 @@ import { z } from "zod"
 
 const schemaGetUser = z.object({
   params: z.object({
-    user_id: z.string().uuid("ID de usuário inválido")
+    username: z.string().min(4, "Usuário Inválido")
   })
 })
 

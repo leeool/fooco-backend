@@ -21,9 +21,9 @@ class UserController {
 
   async show(req: Request, res: Response) {
     const { username } = req.params
-    console.log(username)
     const user = await userRepository.findOne({
-      relations: { posts: true },
+      relations: { posts: { user: true } },
+      relationLoadStrategy: "query",
       where: { username }
     })
 

@@ -23,7 +23,7 @@ class UserController {
     const { username } = req.params
 
     const user = await userRepository.findOne({
-      relations: { posts: { user: false } },
+      relations: { posts: { user: true } },
       where: { username }
     })
 

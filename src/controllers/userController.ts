@@ -137,7 +137,7 @@ class UserController {
       banner_url,
       educational_place,
       educational_place_url,
-      saved_posts: user.saved_posts.concat(saved_posts)
+      saved_posts
     })
 
     await userRepository.update(user_id, updatedUser)

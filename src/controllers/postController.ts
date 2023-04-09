@@ -8,6 +8,7 @@ import ApiError, {
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 import jwt from "jsonwebtoken"
+import { Not } from "typeorm"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
@@ -65,6 +66,10 @@ class postController {
       .split(" ")
       .join("-")
 
+    if (!title || !content) {
+      throw new BadRequestError("Titulo e conteúdo não foram informados.")
+    }
+
     const token = authorization!.split(" ")[1]
 
     if (!authorization || !token) {
@@ -85,8 +90,12 @@ class postController {
       throw new UnauthorizedError("Usuário não autorizado.")
     }
 
-    if (!title || !content) {
-      throw new BadRequestError("Titulo e conteúdo não foram informados.")
+    const userAlreadyHasPost = await postRepository.find({
+      where: { slug: slugTitle, user: { id: user_id } }
+    })
+
+    if (userAlreadyHasPost.length > 0) {
+      throw new ForbiddenError("Já existe um post com esse título.")
     }
 
     const { password, posts, ...user } = userExists
@@ -145,6 +154,14 @@ class postController {
 
     if (!userOwnerPost.length) {
       throw new ForbiddenError("Este post não pertence ao usuário.")
+    }
+
+    const userAlreadyHasPost = await postRepository.find({
+      where: { title: title, user: { id: user_id }, id: Not(post_id) }
+    })
+
+    if (userAlreadyHasPost.length > 0) {
+      throw new ForbiddenError("Já existe um post com esse título.")
     }
 
     const updatedPost = postRepository.create({ title, content, tags })

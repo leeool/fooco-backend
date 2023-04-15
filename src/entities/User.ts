@@ -42,7 +42,7 @@ class User {
   @Column({ type: "varchar", default: "" })
   educational_place_url: string
 
-  @Column({ type: "varchar", length: 100, default: "" })
+  @Column({ type: "varchar", length: 500, default: "" })
   about: string
 
   @Column({ type: "varchar", default: "" })

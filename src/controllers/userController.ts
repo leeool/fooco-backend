@@ -199,7 +199,8 @@ class UserController {
         "educational_place",
         "educational_place_url",
         "posts",
-        "created_at"
+        "created_at",
+        "saved_posts"
       ]
     })
 

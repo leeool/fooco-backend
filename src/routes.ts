@@ -13,6 +13,7 @@ import {
   schemaCreateUser,
   schemaCreatePost
 } from "./schemas/"
+import schemaUpdatePost from "./schemas/postSchemas/schemaUpdatePost"
 
 const router = Router()
 
@@ -23,7 +24,7 @@ router.get("/post/:username", postController.show)
 router.post("/post", schemaParse(schemaCreatePost), auth, postController.store)
 router.put(
   "/post/:post_id",
-  schemaParse(postSchema),
+  schemaParse(schemaUpdatePost),
   auth,
   postController.update
 )

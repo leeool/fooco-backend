@@ -13,8 +13,11 @@ class User {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @Column({ type: "varchar", unique: true })
+  @Column({ type: "varchar", unique: true, length: 15 })
   username: string
+
+  @Column({ type: "varchar", unique: true, length: 15 })
+  slug: string
 
   @Column({ type: "varchar", unique: true })
   email: string

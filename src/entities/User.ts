@@ -42,6 +42,17 @@ class User {
   posts: Post[]
 
   @OneToMany(() => Reply, (reply) => reply.user)
+  @JoinTable({
+    name: "user_reply",
+    joinColumn: {
+      name: "user_id",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "reply_id",
+      referencedColumnName: "id"
+    }
+  })
   reply: Reply[]
 
   @Column({ type: "varchar", default: "" })

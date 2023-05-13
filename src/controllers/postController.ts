@@ -8,7 +8,10 @@ import ApiError, {
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 import jwt from "jsonwebtoken"
-import { Not } from "typeorm"
+import { IsNull, Not } from "typeorm"
+import Post from "../entities/Post"
+import replyController from "./replyController"
+import replyRepository from "../repositories/replyRepository"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
@@ -26,12 +29,12 @@ class postController {
 
     const userExists = await userRepository.findOneBy({ username })
 
-    const postExists = await postRepository.findOneBy({
+    const post = await postRepository.findOneBy({
       slug: post_slug,
       user: { username }
     })
 
-    if (!userExists || !postExists) {
+    if (!userExists || !post) {
       throw new NotFoundError("Página não encontrada.")
     }
 
@@ -43,12 +46,12 @@ class postController {
 
       res.json(userPosts)
     } else {
-      const post = await postRepository.findOne({
-        relations: { user: true, children: { user: true } },
-        where: { user: { username: username }, slug: post_slug }
+      const children = await replyRepository.find({
+        relations: ["user"],
+        where: { post_id: post.id }
       })
 
-      res.json(post)
+      res.json({ ...post, children })
     }
   }
 

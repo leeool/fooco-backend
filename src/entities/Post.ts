@@ -42,7 +42,7 @@ class Post {
   @Column({ type: "varchar", default: "" })
   slug: string
 
-  @OneToMany(() => Reply, (reply) => reply.post_id, { eager: true })
+  @OneToMany(() => Reply, (reply) => reply.post_id)
   @JoinTable({
     name: "reply_post",
     joinColumn: {
@@ -54,7 +54,7 @@ class Post {
       referencedColumnName: "id"
     }
   })
-  children: Reply[]
+  reply: Reply[]
 
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })

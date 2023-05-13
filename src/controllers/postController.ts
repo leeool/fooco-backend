@@ -29,9 +29,9 @@ class postController {
 
     const userExists = await userRepository.findOneBy({ username })
 
-    const post = await postRepository.findOneBy({
-      slug: post_slug,
-      user: { username }
+    const post = await postRepository.findOne({
+      relations: ["user"],
+      where: { user: { username }, slug: post_slug }
     })
 
     if (!userExists || !post) {

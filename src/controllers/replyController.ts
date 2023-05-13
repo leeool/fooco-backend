@@ -12,7 +12,10 @@ class replyController {
   async show(req: Express.Request, res: Express.Response) {
     const { reply_id } = req.params
 
-    const reply = await replyRepository.findOneBy({ id: reply_id })
+    const reply = await replyRepository.findOne({
+      where: { id: reply_id },
+      relations: ["user"]
+    })
 
     if (!reply) {
       throw new NotFoundError("Resposta não encontrada.")

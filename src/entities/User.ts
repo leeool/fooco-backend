@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn
@@ -40,8 +41,8 @@ class User {
   })
   posts: Post[]
 
-  @OneToMany(() => Reply, (reply) => reply.user, { eager: true })
-  replies: Reply[]
+  @OneToMany(() => Reply, (reply) => reply.user)
+  reply: Reply[]
 
   @Column({ type: "varchar", default: "" })
   educational_place: string

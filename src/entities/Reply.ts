@@ -40,8 +40,18 @@ class Reply {
   @OneToMany(() => Reply, (reply) => reply.id)
   replies: Reply[]
 
-  @ManyToOne(() => User, (user) => user.replies)
-  @JoinColumn({ name: "user_id" })
+  @ManyToOne(() => User, (user) => user.reply)
+  @JoinTable({
+    name: "reply_user",
+    joinColumn: {
+      name: "reply_id",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "user_id",
+      referencedColumnName: "id"
+    }
+  })
   user: User
 }
 

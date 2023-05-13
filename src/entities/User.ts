@@ -7,16 +7,17 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm"
 import Post from "./Post"
+import Reply from "./Reply"
 
 @Entity("users")
 class User {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @Column({ type: "varchar", unique: true, length: 15 })
+  @Column({ type: "varchar", unique: true })
   username: string
 
-  @Column({ type: "varchar", unique: true, length: 15 })
+  @Column({ type: "varchar", default: "" })
   slug: string
 
   @Column({ type: "varchar", unique: true })
@@ -38,6 +39,9 @@ class User {
     }
   })
   posts: Post[]
+
+  @OneToMany(() => Reply, (reply) => reply.user, { eager: true })
+  replies: Reply[]
 
   @Column({ type: "varchar", default: "" })
   educational_place: string

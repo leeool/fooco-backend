@@ -6,7 +6,6 @@ import tokenController from "./controllers/tokenController"
 import auth from "./middlewares/auth"
 import schemaParse from "./middlewares/schemaParse"
 import {
-  postSchema,
   schemaUpdateUser,
   schemaGetUser,
   schemaDeleteUser,
@@ -14,6 +13,7 @@ import {
   schemaCreatePost
 } from "./schemas/"
 import schemaUpdatePost from "./schemas/postSchemas/schemaUpdatePost"
+import replyController from "./controllers/replyController"
 
 const router = Router()
 
@@ -30,6 +30,17 @@ router.put(
 )
 router.delete("/post/:post_id", auth, postController.delete)
 router.post("/post/feedback/:post_id", auth, postController.feedback)
+
+// POST CHILDREN
+
+router.get("/reply", replyController.index)
+router.get("/reply/:reply_id", replyController.show)
+router.post(
+  "/:post_id/reply",
+  // schemaParse(schemaCreatePost),
+  auth,
+  replyController.store
+)
 
 // USERS
 router.get("/user", userController.index)

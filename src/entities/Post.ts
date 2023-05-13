@@ -3,10 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm"
 import User from "./User"
+import Reply from "./Reply"
 
 @Entity("posts")
 class Post {
@@ -38,6 +41,20 @@ class Post {
 
   @Column({ type: "varchar", default: "" })
   slug: string
+
+  @OneToMany(() => Reply, (reply) => reply.post_id, { eager: true })
+  @JoinTable({
+    name: "reply_post",
+    joinColumn: {
+      name: "reply_id",
+      referencedColumnName: "id"
+    },
+    inverseJoinColumn: {
+      name: "post_id",
+      referencedColumnName: "id"
+    }
+  })
+  children: Reply[]
 
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })

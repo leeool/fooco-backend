@@ -44,7 +44,7 @@ class postController {
       res.json(userPosts)
     } else {
       const post = await postRepository.findOne({
-        relations: { user: true },
+        relations: { user: true, children: { user: true } },
         where: { user: { username: username }, slug: post_slug }
       })
 

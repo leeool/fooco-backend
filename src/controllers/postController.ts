@@ -8,7 +8,7 @@ import ApiError, {
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 import jwt from "jsonwebtoken"
-import { IsNull, Not } from "typeorm"
+import { IsNull, Not, SelectQueryBuilder } from "typeorm"
 import Post from "../entities/Post"
 import replyController from "./replyController"
 import replyRepository from "../repositories/replyRepository"
@@ -19,8 +19,10 @@ class postController {
 
     const posts = await postRepository.find({
       relations: {
-        user: true
+        user: true,
+        reply: true
       },
+      select: ["id", "title", "slug", "created_at", "points", "tags"],
       order: { created_at: order === "asc" ? "ASC" : "DESC" }
     })
 

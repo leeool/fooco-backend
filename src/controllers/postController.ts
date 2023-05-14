@@ -15,10 +15,13 @@ import replyRepository from "../repositories/replyRepository"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
+    const { order = "desc" } = req.query
+
     const posts = await postRepository.find({
       relations: {
         user: true
-      }
+      },
+      order: { created_at: order === "asc" ? "ASC" : "DESC" }
     })
 
     res.status(200).json(posts)

@@ -51,12 +51,12 @@ class postController {
 
       res.json(userPosts)
     } else {
-      const children = await replyRepository.find({
+      const reply = await replyRepository.find({
         relations: ["user"],
         where: { post_id: post.id }
       })
 
-      res.json({ ...post, children })
+      res.json({ ...post, reply })
     }
   }
 

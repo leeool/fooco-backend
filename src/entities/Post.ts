@@ -42,7 +42,10 @@ class Post {
   @Column({ type: "varchar", default: "" })
   slug: string
 
-  @OneToMany(() => Reply, (reply) => reply.post_id)
+  @OneToMany(() => Reply, (reply) => reply.post_id, {
+    nullable: true,
+    eager: true
+  })
   @JoinTable({
     name: "reply_post",
     joinColumn: {

@@ -14,7 +14,6 @@ import {
 } from "./schemas/"
 import schemaUpdatePost from "./schemas/postSchemas/schemaUpdatePost"
 import commentController from "./controllers/commentController"
-import { createPostShape } from "./schemas/postSchemas/schemaCreatePost"
 
 const router = Router()
 
@@ -36,12 +35,7 @@ router.post("/post/feedback/:post_id", auth, postController.feedback)
 
 router.get("/reply", commentController.index)
 router.get("/reply/:reply_id", commentController.show)
-router.post(
-  "/reply/:post_id",
-  schemaParse(createPostShape.pick({ content: true })),
-  auth,
-  commentController.store
-)
+router.post("/reply/:post_id", auth, commentController.store)
 
 // USERS
 router.get("/user", userController.index)

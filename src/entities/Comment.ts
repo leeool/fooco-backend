@@ -1,18 +1,15 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
-  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm"
 import User from "./User"
 import Post from "./Post"
 
-@Entity("replies")
-class Reply {
+@Entity("comments")
+class Comment {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
@@ -37,14 +34,11 @@ class Reply {
   @Column({ default: [], array: true, type: "varchar" })
   users_disliked: string[]
 
-  @OneToMany(() => Reply, (reply) => reply.id)
-  replies: Reply[]
-
   @ManyToOne(() => User, (user) => user.reply)
   @JoinTable({
-    name: "reply_user",
+    name: "comment_user",
     joinColumn: {
-      name: "reply_id",
+      name: "comment_id",
       referencedColumnName: "id"
     },
     inverseJoinColumn: {
@@ -55,4 +49,4 @@ class Reply {
   user: User
 }
 
-export default Reply
+export default Comment

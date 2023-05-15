@@ -1,5 +1,5 @@
 import Express from "express"
-import ApiError, {
+import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
@@ -8,10 +8,8 @@ import ApiError, {
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 import jwt from "jsonwebtoken"
-import { IsNull, Not, SelectQueryBuilder } from "typeorm"
-import Post from "../entities/Post"
-import replyController from "./replyController"
-import replyRepository from "../repositories/replyRepository"
+import { Not } from "typeorm"
+import commentRepository from "../repositories/commentRepository"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
@@ -51,7 +49,7 @@ class postController {
 
       res.json(userPosts)
     } else {
-      const reply = await replyRepository.find({
+      const reply = await commentRepository.find({
         relations: ["user"],
         where: { post_id: post.id }
       })

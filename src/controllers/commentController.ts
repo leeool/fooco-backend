@@ -1,10 +1,10 @@
 import Express from "express"
 import postRepository from "../repositories/postRepository"
 import { NotFoundError } from "../helpers/apiErrors"
-import replyRepository from "../repositories/replyRepository"
+import commentRepository from "../repositories/commentRepository"
 import userRepository from "../repositories/userRepository"
 
-class replyController {
+class commentController {
   index() {
     return "Hello World"
   }
@@ -12,8 +12,9 @@ class replyController {
   async show(req: Express.Request, res: Express.Response) {
     const { reply_id } = req.params
 
-    const reply = await replyRepository.findOne({
+    const reply = await commentRepository.findOne({
       where: { id: reply_id },
+      relationLoadStrategy: "query",
       relations: ["user"]
     })
 
@@ -43,9 +44,9 @@ class replyController {
       throw new NotFoundError("Usuário não encontrado.")
     }
 
-    const reply = replyRepository.create({ content, user, post_id })
+    const reply = commentRepository.create({ content, user, post_id })
 
-    await replyRepository.save(reply)
+    await commentRepository.save(reply)
 
     res.status(201).json(reply)
   }
@@ -55,4 +56,4 @@ class replyController {
   delete() {}
 }
 
-export default new replyController()
+export default new commentController()

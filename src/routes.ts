@@ -13,7 +13,7 @@ import {
   schemaCreatePost
 } from "./schemas/"
 import schemaUpdatePost from "./schemas/postSchemas/schemaUpdatePost"
-import replyController from "./controllers/replyController"
+import commentController from "./controllers/commentController"
 
 const router = Router()
 
@@ -33,13 +33,13 @@ router.post("/post/feedback/:post_id", auth, postController.feedback)
 
 // POST CHILDREN
 
-router.get("/reply", replyController.index)
-router.get("/reply/:reply_id", replyController.show)
+router.get("/reply", commentController.index)
+router.get("/reply/:reply_id", commentController.show)
 router.post(
-  "/:post_id/reply",
-  // schemaParse(schemaCreatePost),
+  "/reply/:post_id",
+  schemaParse(schemaCreatePost),
   auth,
-  replyController.store
+  commentController.store
 )
 
 // USERS

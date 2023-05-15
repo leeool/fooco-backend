@@ -2,13 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm"
 import Post from "./Post"
-import Reply from "./Reply"
+import Comment from "./Comment"
 
 @Entity("users")
 class User {
@@ -41,19 +40,19 @@ class User {
   })
   posts: Post[]
 
-  @OneToMany(() => Reply, (reply) => reply.user)
+  @OneToMany(() => Comment, (comment) => comment.user)
   @JoinTable({
-    name: "user_reply",
+    name: "user_comment",
     joinColumn: {
       name: "user_id",
       referencedColumnName: "id"
     },
     inverseJoinColumn: {
-      name: "reply_id",
+      name: "comment_id",
       referencedColumnName: "id"
     }
   })
-  reply: Reply[]
+  reply: Comment[]
 
   @Column({ type: "varchar", default: "" })
   educational_place: string

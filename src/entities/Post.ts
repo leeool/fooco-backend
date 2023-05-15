@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm"
 import User from "./User"
-import Reply from "./Reply"
+import Comment from "./Comment"
 
 @Entity("posts")
 class Post {
@@ -42,7 +42,7 @@ class Post {
   @Column({ type: "varchar", default: "" })
   slug: string
 
-  @OneToMany(() => Reply, (reply) => reply.post_id, {
+  @OneToMany(() => Comment, (comment) => comment.post_id, {
     nullable: true,
     eager: true
   })
@@ -57,7 +57,7 @@ class Post {
       referencedColumnName: "id"
     }
   })
-  reply: Reply[]
+  reply: Comment[]
 
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })

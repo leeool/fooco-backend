@@ -20,7 +20,7 @@ const schemaCreatePost = z.object({
   })
 })
 
-const createPostShape = schemaCreatePost.shape.body
+export const createPostShape = schemaCreatePost.shape.body
 
 declare global {
   type createPostTypes = z.infer<typeof createPostShape>

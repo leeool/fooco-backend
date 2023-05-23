@@ -25,7 +25,11 @@ class UserController {
   async show(req: Request, res: Response) {
     const { username } = req.params
     const user = await userRepository.findOne({
-      relations: { posts: { user: true }, reply: { user: true } },
+      relations: {
+        posts: { user: true },
+        reply: { user: true },
+        savedPosts: { user: true }
+      },
       relationLoadStrategy: "query",
       where: { username }
     })
@@ -124,7 +128,7 @@ class UserController {
 
     const favoritePosts = await postRepository.findBy({ id: In(savedPostsId) })
 
-    const savedPosts = [...favoritePosts, ...(user.savedPosts || [])]
+    const savedPosts = [...favoritePosts]
 
     const updatedUser = await userRepository.preload({
       ...user,

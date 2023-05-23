@@ -185,6 +185,7 @@ class UserController {
 
     const user = await userRepository.findOne({
       where: [{ email: email }, { username: email }],
+      relations: { savedPosts: true },
       select: [
         "password",
         "id",

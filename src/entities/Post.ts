@@ -4,6 +4,7 @@ import {
   Entity,
   JoinColumn,
   JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn
@@ -58,6 +59,9 @@ class Post {
     }
   })
   reply: Comment[]
+
+  @ManyToMany(() => User, (user) => user.savedPosts)
+  usersSaved: User[]
 
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })

@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm"
@@ -69,8 +70,9 @@ class User {
   @Column({ type: "varchar", default: "" })
   banner_url: string
 
-  @Column({ type: "varchar", default: [], array: true })
-  saved_posts: string[]
+  @ManyToMany(() => Post, (post) => post.usersSaved, { cascade: true })
+  @JoinTable()
+  savedPosts: Post[]
 
   @CreateDateColumn({
     transformer: {

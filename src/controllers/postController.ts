@@ -13,15 +13,22 @@ import commentRepository from "../repositories/commentRepository"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
-    const { order = "desc" } = req.query
+    const order = req.query
+
+    const [key, value] = Object.keys(order).length
+      ? Object.entries(order)[0]
+      : ["created_at", "asc"]
 
     const posts = await postRepository.find({
       relations: {
         user: true,
         reply: true
       },
+      loadEagerRelations: false,
       select: ["id", "title", "slug", "created_at", "points", "tags"],
-      order: { created_at: order === "asc" ? "ASC" : "DESC" }
+      order: {
+        [key as string]: value === "asc" ? "ASC" : "DESC"
+      }
     })
 
     res.status(200).json(posts)

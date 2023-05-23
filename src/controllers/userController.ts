@@ -3,7 +3,7 @@ import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import { Equal, Not } from "typeorm"
+import { Equal, In, Not } from "typeorm"
 import {
   BadRequestError,
   NotFoundError,
@@ -13,8 +13,11 @@ import {
 
 class UserController {
   async index(req: Request, res: Response) {
+    const { order } = req.query
     const users = await userRepository.find({
-      relations: { posts: true }
+      relations: { posts: true },
+      relationLoadStrategy: "query",
+      order: { posts: { points: "DESC" } }
     })
     res.status(200).json(users)
   }
@@ -76,21 +79,12 @@ class UserController {
     res: Response
   ) {
     const { user_id } = req.params
-    const {
-      username,
-      email,
-      password,
-      about,
-      avatar_url,
-      banner_url,
-      educational_place,
-      educational_place_url,
-      saved_posts
-    } = req.body
+    const { password, savedPostsId = [], ...newData } = req.body
     const { authorization } = req.headers
 
     let user = await userRepository.findOne({
       where: { id: user_id },
+      relations: { savedPosts: true },
       select: { id: true, username: true, email: true, password: true }
     })
 
@@ -109,11 +103,11 @@ class UserController {
     }
 
     const usernameExists = await userRepository.findOne({
-      where: { username: Equal(username || ""), id: Not(user_id) }
+      where: { username: Equal(newData.username || ""), id: Not(user_id) }
     })
 
     const emailExists = await userRepository.findOne({
-      where: { email: Equal(email || ""), id: Not(user_id) }
+      where: { email: Equal(newData.email || ""), id: Not(user_id) }
     })
 
     if (usernameExists) {
@@ -128,26 +122,25 @@ class UserController {
       ? await bcrypt.hash(password, 10)
       : user.password
 
-    const updatedUser = userRepository.create({
-      username: username || user.username,
-      email: email || user.email,
-      password: updatedPassword,
-      about,
-      avatar_url,
-      banner_url,
-      educational_place,
-      educational_place_url,
-      saved_posts
+    const favoritePosts = await postRepository.findBy({ id: In(savedPostsId) })
+
+    const savedPosts = [...favoritePosts, ...(user.savedPosts || [])]
+
+    const updatedUser = await userRepository.preload({
+      ...user,
+      ...newData,
+      password: updatedPassword || user.password,
+      savedPosts: savedPosts,
+      id: user_id
     })
 
-    await userRepository.update(user_id, updatedUser)
+    if (!updatedUser) return
 
-    user = await userRepository.findOne({
-      where: { id: user_id },
-      relations: { posts: true }
-    })
+    await userRepository.save(updatedUser)
 
-    res.status(200).json(user)
+    const { password: _, ...userWithoutPassword } = updatedUser
+
+    res.status(200).json(userWithoutPassword)
   }
 
   async delete(req: Request<deleteUserParamsTypes>, res: Response) {
@@ -200,7 +193,7 @@ class UserController {
         "educational_place_url",
         "posts",
         "created_at",
-        "saved_posts"
+        "savedPosts"
       ]
     })
 
@@ -218,7 +211,7 @@ class UserController {
       { username: user.username, id: user.id },
       process.env.JWT_PASS!,
       {
-        expiresIn: "1d"
+        expiresIn: "60d"
       }
     )
 

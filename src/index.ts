@@ -10,7 +10,12 @@ AppDataSource.initialize().then(() => {
   const app = Express()
 
   app.use(Express.json())
-  app.use(cors({ origin: true, credentials: true }))
+  app.use(
+    cors({
+      origin: ["https://fooco.netlify.app", "http://localhost:3000"],
+      credentials: true
+    })
+  )
   // app.use(setLimiter(defaultLimiter))
   app.use(router)
   app.use(errorMiddleware)

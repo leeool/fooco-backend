@@ -22,8 +22,6 @@ class tokenController {
         relations: { savedPosts: true }
       })
 
-      console.log(user)
-
       return res.status(200).json({ decoded, user })
     })
   }

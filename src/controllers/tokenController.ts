@@ -17,7 +17,10 @@ class tokenController {
       if (err || !decoded || typeof decoded === "string" || !("id" in decoded))
         throw new UnauthorizedError("Token inválido.")
 
-      const user = await userRepository.findOneBy({ id: decoded.id })
+      const user = await userRepository.findOne({
+        where: { id: decoded.id },
+        relations: { savedPosts: true }
+      })
 
       console.log(user)
 

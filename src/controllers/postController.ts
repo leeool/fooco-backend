@@ -8,28 +8,42 @@ import {
 import postRepository from "../repositories/postRepository"
 import userRepository from "../repositories/userRepository"
 import jwt from "jsonwebtoken"
-import { Not } from "typeorm"
+import { Any, ArrayOverlap, Not } from "typeorm"
 import commentRepository from "../repositories/commentRepository"
+import Cap from "../helpers/capitalize"
+import Post from "../entities/Post"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
-    const order = req.query
+    const { created_at = "desc", q = "" } = req.query
 
-    const [key, value] = Object.keys(order).length
-      ? Object.entries(order)[0]
-      : ["created_at", "asc"]
+    let posts: Post[]
 
-    const posts = await postRepository.find({
-      relations: {
-        user: true,
-        reply: true
-      },
-      loadEagerRelations: false,
-      select: ["id", "title", "slug", "created_at", "points", "tags"],
-      order: {
-        [key as string]: value === "asc" ? "ASC" : "DESC"
-      }
-    })
+    if (q) {
+      console.log(Cap<Array<string>>(String(q).trim().split(" ")))
+      posts = await postRepository.find({
+        relations: {
+          user: true,
+          reply: true
+        },
+        where: {
+          tags: ArrayOverlap(Cap<Array<string>>(String(q).trim().split(" ")))
+        },
+        loadEagerRelations: false,
+        select: ["id", "title", "slug", "created_at", "points", "tags"],
+        order: { created_at: created_at === "asc" ? "ASC" : "DESC" }
+      })
+    } else {
+      posts = await postRepository.find({
+        relations: {
+          user: true,
+          reply: true
+        },
+        loadEagerRelations: false,
+        select: ["id", "title", "slug", "created_at", "points", "tags"],
+        order: { created_at: created_at === "asc" ? "ASC" : "DESC" }
+      })
+    }
 
     res.status(200).json(posts)
   }
@@ -117,7 +131,7 @@ class postController {
       title,
       content,
       user,
-      tags,
+      tags: tags ? Cap<Array<string>>(tags) : [],
       slug: slugTitle
     })
     await postRepository.save(post)
@@ -177,7 +191,11 @@ class postController {
       throw new ForbiddenError("Já existe um post com esse título.")
     }
 
-    const updatedPost = postRepository.create({ title, content, tags })
+    const updatedPost = postRepository.create({
+      title,
+      content,
+      tags: tags ? Cap<Array<string>>(tags) : []
+    })
     await postRepository.update(post_id, updatedPost)
 
     postById = await postRepository.findOne({

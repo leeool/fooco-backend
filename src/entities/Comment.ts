@@ -13,7 +13,10 @@ class Comment {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @ManyToOne(() => Post, (post) => post.id)
+  @ManyToOne(() => Post, (post) => post.id, {
+    onDelete: "CASCADE",
+    orphanedRowAction: "delete"
+  })
   @Column({ type: "uuid" })
   post_id: string
 
@@ -34,7 +37,10 @@ class Comment {
   @Column({ default: [], array: true, type: "varchar" })
   users_disliked: string[]
 
-  @ManyToOne(() => User, (user) => user.reply)
+  @ManyToOne(() => User, (user) => user.reply, {
+    onDelete: "CASCADE",
+    orphanedRowAction: "delete"
+  })
   @JoinTable({
     name: "comment_user",
     joinColumn: {

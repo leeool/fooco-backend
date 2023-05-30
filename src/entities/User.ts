@@ -21,7 +21,18 @@ class User {
   @Column({ type: "varchar", default: "" })
   slug: string
 
-  @Column({ type: "varchar", unique: true })
+  @Column({
+    type: "varchar",
+    unique: true,
+    transformer: {
+      to(value: string) {
+        return value.toLowerCase()
+      },
+      from(value: string) {
+        return value.toLowerCase()
+      }
+    }
+  })
   email: string
 
   @Column({ type: "text", select: false })
@@ -41,7 +52,7 @@ class User {
   })
   posts: Post[]
 
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.user, { cascade: ["remove"] })
   @JoinTable({
     name: "user_comment",
     joinColumn: {

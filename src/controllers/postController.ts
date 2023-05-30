@@ -132,7 +132,9 @@ class postController {
       content,
       user,
       tags: tags ? Cap<Array<string>>(tags) : [],
-      slug: slugTitle
+      slug: slugTitle,
+      users_liked: [user.id],
+      points: 1
     })
     await postRepository.save(post)
 

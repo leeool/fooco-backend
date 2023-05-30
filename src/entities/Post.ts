@@ -45,7 +45,8 @@ class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post_id, {
     nullable: true,
-    eager: true
+    eager: true,
+    cascade: ["remove"]
   })
   @JoinTable({
     name: "reply_post",

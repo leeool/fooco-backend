@@ -22,6 +22,8 @@ class tokenController {
         relations: { savedPosts: true }
       })
 
+      if (!user) throw new UnauthorizedError("Token inválido.")
+
       return res.status(200).json({ decoded, user })
     })
   }

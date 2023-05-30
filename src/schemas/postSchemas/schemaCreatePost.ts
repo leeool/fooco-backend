@@ -11,7 +11,7 @@ const schemaCreatePost = z.object({
       .string()
       .trim()
       .min(20, "O conteúdo do seu post é muito curto!")
-      .max(2000, "O conteúdo do seu post é muito longo!"),
+      .max(5000, "O conteúdo do seu post é muito longo!"),
     user_id: z.string().trim().uuid("Formato de ID inválido"),
     tags: z
       .array(z.string().max(20, "Tag muito longa"))

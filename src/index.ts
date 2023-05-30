@@ -12,7 +12,11 @@ AppDataSource.initialize().then(() => {
   app.use(Express.json())
   app.use(
     cors({
-      origin: ["https://fooco.netlify.app", "http://localhost:3000"],
+      origin: [
+        "https://fooco.netlify.app",
+        "http://localhost:3000",
+        "http://192.168.100.125:3000"
+      ],
       credentials: true
     })
   )

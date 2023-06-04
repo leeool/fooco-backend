@@ -10,6 +10,7 @@ import {
   TooManyRequests,
   UnauthorizedError
 } from "../helpers/apiErrors"
+import Post from "src/entities/Post"
 
 class UserController {
   async index(req: Request, res: Response) {
@@ -128,7 +129,8 @@ class UserController {
 
     const favoritePosts = await postRepository.findBy({ id: In(savedPostsId) })
 
-    const savedPosts = [...favoritePosts]
+    const savedPosts =
+      favoritePosts.length > 0 ? favoritePosts : user.savedPosts
 
     const updatedUser = await userRepository.preload({
       ...user,

@@ -81,7 +81,11 @@ class User {
   @Column({ type: "varchar", default: "" })
   banner_url: string
 
-  @ManyToMany(() => Post, (post) => post.usersSaved, { cascade: true })
+  @ManyToMany(() => Post, (post) => post.usersSaved, {
+    onDelete: "CASCADE",
+    orphanedRowAction: "delete",
+    cascade: true
+  })
   @JoinTable()
   savedPosts: Post[]
 

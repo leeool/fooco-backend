@@ -61,7 +61,10 @@ class Post {
   })
   reply: Comment[]
 
-  @ManyToMany(() => User, (user) => user.savedPosts)
+  @ManyToMany(() => User, (user) => user.savedPosts, {
+    onDelete: "CASCADE",
+    orphanedRowAction: "delete"
+  })
   usersSaved: User[]
 
   @ManyToOne(() => User, (user) => user.posts)

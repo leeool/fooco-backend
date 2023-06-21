@@ -14,12 +14,22 @@ import Post from "src/entities/Post"
 
 class UserController {
   async index(req: Request, res: Response) {
-    const { order } = req.query
-    const users = await userRepository.find({
-      relations: { posts: true },
-      relationLoadStrategy: "query",
-      order: { posts: { points: "DESC" } }
-    })
+    const { email } = req.query
+
+    let users
+
+    if (email) {
+      users = await userRepository.findOne({
+        where: { email: Equal(email as string) }
+      })
+    } else {
+      users = await userRepository.find({
+        relations: { posts: true },
+        relationLoadStrategy: "query",
+        order: { posts: { points: "DESC" } }
+      })
+    }
+
     res.status(200).json(users)
   }
 

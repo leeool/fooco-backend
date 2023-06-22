@@ -43,20 +43,11 @@ class Comment {
     onDelete: "CASCADE",
     orphanedRowAction: "delete"
   })
-  @JoinTable({
-    name: "comment_user",
-    joinColumn: {
-      name: "comment_id",
-      referencedColumnName: "id"
-    },
-    inverseJoinColumn: {
-      name: "user_id",
-      referencedColumnName: "id"
-    }
-  })
   user: User
 
-  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
+  @ManyToOne(() => Comment, (comment) => comment.replies, {
+    nullable: true
+  })
   @JoinColumn({ name: "parent_id" })
   parent: Comment
 

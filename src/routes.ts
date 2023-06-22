@@ -14,6 +14,7 @@ import {
 } from "./schemas/"
 import schemaUpdatePost from "./schemas/postSchemas/schemaUpdatePost"
 import commentController from "./controllers/commentController"
+import groupController from "./controllers/groupController"
 
 const router = Router()
 
@@ -29,14 +30,16 @@ router.put(
   postController.update
 )
 router.delete("/post/:post_id", auth, postController.delete)
-router.post("/post/feedback/:post_id", auth, postController.feedback)
+router.put("/post/feedback/:post_id", auth, postController.feedback)
 
 // POST CHILDREN
 
 router.get("/reply", commentController.index)
-router.get("/reply/:reply_id", commentController.show)
+// router.get("/reply/:reply_id", commentController.show)
+router.get("/reply/:post_id", commentController.getByPost)
 router.post("/reply/:post_id", auth, commentController.store)
 router.post("/reply/:post_id/:parent_id", auth, commentController.addReply)
+router.put("/reply/feedback/:target_id", commentController.feedback)
 
 // USERS
 router.get("/user", userController.index)
@@ -58,5 +61,11 @@ router.delete(
 
 // TOKEN
 router.post("/token", tokenController.validadeToken)
+
+// GROUP
+
+router.get("/group", groupController.index)
+router.get("/group/:id", groupController.show)
+router.post("/group", groupController.store)
 
 export default router

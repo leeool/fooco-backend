@@ -16,7 +16,8 @@ const schemaCreatePost = z.object({
     tags: z
       .array(z.string().max(20, "Tag muito longa"))
       .max(8, "Limite de tags atingido")
-      .optional()
+      .optional(),
+    group_id: z.string().trim().uuid("Formato de ID inválido").optional()
   })
 })
 

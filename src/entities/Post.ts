@@ -11,6 +11,7 @@ import {
 } from "typeorm"
 import User from "./User"
 import Comment from "./Comment"
+import Group from "./Group"
 
 @Entity("posts")
 class Post {
@@ -45,7 +46,6 @@ class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post_id, {
     nullable: true,
-    eager: true,
     cascade: ["remove"]
   })
   @JoinTable({
@@ -70,6 +70,9 @@ class Post {
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "user_id" })
   user: User
+
+  @ManyToOne(() => Group, (group) => group.posts)
+  group: Group
 }
 
 export default Post

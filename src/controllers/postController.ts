@@ -12,6 +12,7 @@ import { Any, ArrayOverlap, Not } from "typeorm"
 import commentRepository from "../repositories/commentRepository"
 import Cap from "../helpers/capitalize"
 import Post from "../entities/Post"
+import groupRepository from "../repositories/groupRepository"
 
 class postController {
   async index(req: Express.Request, res: Express.Response) {
@@ -37,8 +38,10 @@ class postController {
       posts = await postRepository.find({
         relations: {
           user: true,
-          comments: true
+          comments: true,
+          group: true
         },
+        where: { group: { id: "7e170c4f-a480-4503-aee6-e7071c9c6dd5" } },
         loadEagerRelations: false,
         select: ["id", "title", "slug", "created_at", "points", "tags"],
         order: { created_at: created_at === "asc" ? "ASC" : "DESC" }
@@ -54,7 +57,7 @@ class postController {
     const userExists = await userRepository.findOneBy({ username })
 
     const post = await postRepository.findOne({
-      relations: { user: true, comments: { replies: true } },
+      relations: { user: true, comments: false, group: true },
       where: { user: { username }, slug: post_slug }
     })
 
@@ -69,21 +72,23 @@ class postController {
       })
 
       res.json(userPosts)
-    } else {
-      const reply = await commentRepository.find({
-        relations: ["user"],
-        where: { post_id: post.id }
-      })
-
-      res.json({ ...post })
+      return
     }
+
+    res.json(post)
   }
 
   async store(
     req: Express.Request<{}, {}, createPostTypes>,
     res: Express.Response
   ) {
-    const { title, content, user_id, tags } = req.body
+    const {
+      title,
+      content,
+      user_id,
+      tags,
+      group_id = "7e170c4f-a480-4503-aee6-e7071c9c6dd5"
+    } = req.body
     const { authorization } = req.headers
     const removeSpecialChars = /[^A-Za-z0-9\s-]/g
     const slugTitle = title
@@ -126,6 +131,12 @@ class postController {
 
     const { password, posts, ...user } = userExists
 
+    const group = await groupRepository.findOne({ where: { id: group_id } })
+
+    if (!group) {
+      throw new NotFoundError("Grupo não encontrado.")
+    }
+
     const post = postRepository.create({
       title,
       content,
@@ -133,7 +144,8 @@ class postController {
       tags: tags ? Cap<Array<string>>(tags) : [],
       slug: slugTitle,
       users_liked: [user.id],
-      points: 1
+      points: 1,
+      group
     })
     await postRepository.save(post)
 
@@ -247,15 +259,12 @@ class postController {
   }
 
   async feedback(
-    req: Express.Request<
-      { post_id: string },
-      {},
-      { option: "like" | "dislike"; user_id: string }
-    >,
+    req: Express.Request<{ post_id: string }, {}, { user_id: string }>,
     res: Express.Response
   ) {
     const { post_id } = req.params
-    const { user_id, option } = req.body
+    const { user_id } = req.body
+    const { type } = req.query
 
     const postById = await postRepository.findOneBy({ id: post_id })
 
@@ -269,11 +278,11 @@ class postController {
       throw new NotFoundError("Usuário não encontrado.")
     }
 
-    if (!option || !["like", "dislike"].includes(option)) {
+    if (!type || !["like", "dislike"].includes(type as string)) {
       throw new BadRequestError("Opção inválida.")
     }
 
-    if (option === "like") {
+    if (type === "like") {
       // usuário ja tem o post marcado com like
       if (postById.users_liked.includes(userExists.id)) {
         await postRepository.decrement({ id: post_id }, "points", 1)
@@ -308,7 +317,7 @@ class postController {
 
         res.json(postById.points + 1)
       }
-    } else if (option === "dislike") {
+    } else if (type === "dislike") {
       // usuário já tem o post marcado com dislike
       if (postById.users_disliked.includes(userExists.id)) {
         await postRepository.increment({ id: post_id }, "points", 1)

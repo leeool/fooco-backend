@@ -59,7 +59,7 @@ class Post {
       referencedColumnName: "id"
     }
   })
-  reply: Comment[]
+  comments: Comment[]
 
   @ManyToMany(() => User, (user) => user.savedPosts, {
     onDelete: "CASCADE",

@@ -24,7 +24,7 @@ class postController {
       posts = await postRepository.find({
         relations: {
           user: true,
-          reply: true
+          comments: true
         },
         where: {
           tags: ArrayOverlap(Cap<Array<string>>(String(q).trim().split(" ")))
@@ -37,7 +37,7 @@ class postController {
       posts = await postRepository.find({
         relations: {
           user: true,
-          reply: true
+          comments: true
         },
         loadEagerRelations: false,
         select: ["id", "title", "slug", "created_at", "points", "tags"],
@@ -54,7 +54,7 @@ class postController {
     const userExists = await userRepository.findOneBy({ username })
 
     const post = await postRepository.findOne({
-      relations: ["user"],
+      relations: { user: true, comments: { replies: true } },
       where: { user: { username }, slug: post_slug }
     })
 
@@ -75,7 +75,7 @@ class postController {
         where: { post_id: post.id }
       })
 
-      res.json({ ...post, reply })
+      res.json({ ...post })
     }
   }
 
@@ -96,7 +96,6 @@ class postController {
     if (!title || !content) {
       throw new BadRequestError("Titulo e conteúdo não foram informados.")
     }
-
     const token = authorization!.split(" ")[1]
 
     if (!authorization || !token) {

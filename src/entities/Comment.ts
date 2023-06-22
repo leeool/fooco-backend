@@ -1,8 +1,10 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm"
 import User from "./User"
@@ -17,7 +19,7 @@ class Comment {
     onDelete: "CASCADE",
     orphanedRowAction: "delete"
   })
-  @Column({ type: "uuid" })
+  @Column({ type: "uuid", nullable: true })
   post_id: string
 
   @Column({ type: "text" })
@@ -53,6 +55,15 @@ class Comment {
     }
   })
   user: User
+
+  @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
+  @JoinColumn({ name: "parent_id" })
+  parent: Comment
+
+  @OneToMany(() => Comment, (comment) => comment.parent, {
+    cascade: true
+  })
+  replies: Comment[]
 }
 
 export default Comment

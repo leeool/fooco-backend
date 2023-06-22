@@ -36,6 +36,7 @@ router.post("/post/feedback/:post_id", auth, postController.feedback)
 router.get("/reply", commentController.index)
 router.get("/reply/:reply_id", commentController.show)
 router.post("/reply/:post_id", auth, commentController.store)
+router.post("/reply/:post_id/:parent_id", auth, commentController.addReply)
 
 // USERS
 router.get("/user", userController.index)

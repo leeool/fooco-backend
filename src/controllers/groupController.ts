@@ -13,6 +13,7 @@ class GroupController {
 
     const group = await groupRepository.findOne({
       where: { id: id },
+      relationLoadStrategy: "query",
       relations: { posts: { user: true, group: true } },
       order: { posts: { created_at: "DESC" } }
     })

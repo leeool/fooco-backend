@@ -24,7 +24,7 @@ class UserController {
       })
     } else {
       users = await userRepository.find({
-        relations: { posts: true },
+        relations: { posts: true, reply: true },
         relationLoadStrategy: "query",
         order: { posts: { points: "DESC" } }
       })
@@ -38,8 +38,8 @@ class UserController {
     const user = await userRepository.findOne({
       relations: {
         posts: { user: true, group: true },
-        reply: { user: true },
-        savedPosts: { user: true }
+        savedPosts: { user: true, group: true },
+        reply: true
       },
       relationLoadStrategy: "query",
       where: { username }

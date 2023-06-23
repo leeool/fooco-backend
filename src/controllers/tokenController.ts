@@ -19,7 +19,7 @@ class tokenController {
 
       const user = await userRepository.findOne({
         where: { id: decoded.id },
-        relations: { savedPosts: true }
+        relations: { savedPosts: true, reply: true }
       })
 
       if (!user) throw new UnauthorizedError("Token inválido.")

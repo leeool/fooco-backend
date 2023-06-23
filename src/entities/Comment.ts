@@ -46,13 +46,17 @@ class Comment {
   user: User
 
   @ManyToOne(() => Comment, (comment) => comment.replies, {
-    nullable: true
+    nullable: true,
+    onDelete: "CASCADE",
+    orphanedRowAction: "delete"
   })
   @JoinColumn({ name: "parent_id" })
   parent: Comment
 
   @OneToMany(() => Comment, (comment) => comment.parent, {
-    cascade: true
+    cascade: ["remove"],
+    onDelete: "CASCADE",
+    orphanedRowAction: "delete"
   })
   replies: Comment[]
 }
